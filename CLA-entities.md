@@ -80,28 +80,22 @@ TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT WILL YOU BE LIABL
 
 6.5 If any provision of this Agreement is found void and unenforceable, such provision will be replaced to the extent possible with a provision that comes closest to the meaning of the original provision and which is enforceable. The terms and conditions set forth in this Agreement shall apply notwithstanding any failure of essential purpose of this Agreement or any limited remedy to the maximum extent possible under law.
 
-You
+---
 
-\________________________
+Company Name: __________________
 
-Name: __________________
+By: ___________________
+
+Signature: ___________________
 
 Title: ___________________
+
+Date: ________________
+
+Email: ________________
 
 Address: ________________
 
 \________________________
 
-Us
-
-\________________________
-
-Name: __________________
-
-Title: ___________________
-
-Address: ________________
-
-\________________________
-
-Harmony (HA-CLA-E-ANY) Version 1.0
+Based on Harmony (HA-CLA-E-ANY) Version 1.0

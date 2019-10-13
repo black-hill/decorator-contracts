@@ -19,19 +19,17 @@ Contributors can create new items [here](https://dev.azure.com/thenewobjective/d
 
 Non-Contributors will have to send an email to [Michael Haufe](mailto:tno@thenewobjective.com).
 In the future this will be unnecessary when Microsoft resolves the following
-[issue](https://developercommunity.visualstudio.com/content/idea/366493/allow-anonymous-creation-of-user-stories-and-bugs-1.html).
+[issue](https://developercommunity.visualstudio.com/content/idea/366493/allow-anonymous-creation-of-user-stories-and-bugs-1.html) or when a workaround is put into place.
 
 ## Code Contributions
 
-While this code is open source, it is not necessarily free
-(See the Licensing section in [README.md](https://dev.azure.com/thenewobjective/_git/decorator-contracts?path=%2FREADME.md&anchor=licensing)).
-Due to licensing, contributions to this project can not contain code or other
-material that prevents or restricts commercial use in a closed-source
-application. To enforce this you will need to agree to the Contributor
+While this code is open source, its use is restricted
+(see the Licensing section in [README.md](https://dev.azure.com/thenewobjective/_git/decorator-contracts?path=%2FREADME.md&anchor=licensing)).
+Due to licensing restrictions, contributions to this project can not contain code or other material that prevents or restricts commercial use in a closed-source
+application. To enable this you will need to agree to and complete the Contributor
 License Agreement (for [individuals](https://dev.azure.com/thenewobjective/_git/decorator-contracts?path=%2FCLA-individual.md) or
 [entities](https://dev.azure.com/thenewobjective/_git/decorator-contracts?path=%2FCLA-entities.md) as appropriate).
-To do this send an email to `cla@thenewobjective.com` based on one of the following templates
-depending on the CLA you are agreeing to:
+To do this send an email to `cla@thenewobjective.com` based on one of the following templates depending on the CLA you are agreeing to:
 
 ### Individual Contributor License Agreement
 
@@ -99,16 +97,7 @@ npm install
 npm run build
 ```
 
-## Project Management
-
-The project follows a requirements driven, iterative approach.
-
-### Features
-
-A feature is a distinctly identifiable element of the system that satisfies a
-set of requirements {TODO}
-
-### Iterations
+## Iterations
 
 Iterations are named by the planned release version such as `v0.4.0`
 or `1.0.0` depending on the amount of progress made. The iterations
