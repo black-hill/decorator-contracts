@@ -7,20 +7,20 @@
 
 import Assertion from './Assertion';
 import DescriptorWrapper from './lib/DescriptorWrapper';
-import AssertionError from './AssertionError';
+//import AssertionError from './AssertionError';
 import { FeatureRegistration } from './lib/FeatureRegistry';
 import getAncestry from './lib/getAncestry';
 import type { Constructor } from './typings/Constructor';
 import { CLASS_REGISTRY } from './lib/ClassRegistry';
-import { MSG_INVARIANT_REQUIRED, MSG_DECORATE_METHOD_ACCESSOR_ONLY, MSG_SINGLE_RETRY } from './Messages';
+import { MSG_SINGLE_RETRY } from './Messages';
 
 /**
  * The default feature implementation until an invariant is
  * assigned to the class ancestry
  */
-function fnInvariantRequired(): void {
-    throw new AssertionError(MSG_INVARIANT_REQUIRED);
-}
+// function fnInvariantRequired(): void {
+//     throw new AssertionError(MSG_INVARIANT_REQUIRED);
+// }
 
 const checkedAssert: Assertion['assert'] = new Assertion(true).assert;
 
@@ -93,40 +93,6 @@ export default abstract class MemberDecorator {
                 })
                 .map(([key]) => key)
         );
-    }
-
-    /**
-     * Tracks the provided class feauture in a registry defined on the class
-     * and then replaces it with an error throwing placeholder until the
-     * invariant decorator can restore it
-     *
-     * @param {Constructor<any>} Class - The class
-     * @param {PropertyKey} propertyKey - The property key
-     * @param {DescriptorWrapper} descriptorWrapper - The DescriptorWrapper
-     * @returns {FeatureRegistration} - The Decorator Registration
-     */
-    static registerFeature(Class: Constructor<any>, propertyKey: PropertyKey, descriptorWrapper: DescriptorWrapper): FeatureRegistration {
-        const {featureRegistry} = CLASS_REGISTRY.getOrCreate(Class),
-            registration = featureRegistry.getOrCreate(propertyKey, {...descriptorWrapper.descriptor});
-
-        // Potentially undefined in pre ES5 environments (compilation target)
-        checkedAssert(descriptorWrapper.hasDescriptor, MSG_DECORATE_METHOD_ACCESSOR_ONLY, TypeError);
-        checkedAssert(descriptorWrapper.isMethod || descriptorWrapper.isAccessor, MSG_DECORATE_METHOD_ACCESSOR_ONLY);
-
-        if(descriptorWrapper.isMethod) {
-            descriptorWrapper.descriptor!.value = fnInvariantRequired;
-        } else if(descriptorWrapper.isAccessor) {
-            if(descriptorWrapper.hasGetter) {
-                descriptorWrapper.descriptor!.get = fnInvariantRequired;
-            }
-            if(descriptorWrapper.hasSetter) {
-                descriptorWrapper.descriptor!.set = fnInvariantRequired;
-            }
-        } else {
-            throw new Error(`Unhandled condition. Unable to register ${Class.name}.prototype.${String(propertyKey)}`);
-        }
-
-        return registration;
     }
 
     static getAncestorRegistration(Class: Constructor<any>, propertyKey: PropertyKey): FeatureRegistration | undefined {

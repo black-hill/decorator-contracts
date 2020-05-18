@@ -7,9 +7,10 @@
 
 import MemberDecorator from './MemberDecorator';
 import type {PredicateType} from './typings/PredicateType';
-import DescriptorWrapper from './lib/DescriptorWrapper';
 import Assertion from './Assertion';
-import { MSG_INVALID_DECORATOR, MSG_NO_STATIC } from './Messages';
+import { MSG_INVALID_DECORATOR, MSG_NO_STATIC, MSG_DECORATE_METHOD_ACCESSOR_ONLY } from './Messages';
+import { Constructor } from './typings/Constructor';
+import { CLASS_REGISTRY } from './lib/ClassRegistry';
 
 /**
  * The `@ensures` decorator is an assertion of a postcondition.
@@ -39,21 +40,21 @@ export default class EnsuresDecorator extends MemberDecorator {
             assert: Assertion['assert'] = this._assert;
         this._checkedAssert(typeof predicate == 'function', MSG_INVALID_DECORATOR);
 
-        return function(target: any, propertyKey: PropertyKey, currentDescriptor: PropertyDescriptor): PropertyDescriptor {
-            const isStatic = typeof target == 'function';
-            assert(!isStatic, MSG_NO_STATIC, TypeError);
+        return function(target: any, propertyKey: PropertyKey, descriptor: PropertyDescriptor): PropertyDescriptor {
+            assert(typeof target != 'function', MSG_NO_STATIC, TypeError);
+            // Potentially undefined in pre ES5 environments (compilation target)
+            assert(descriptor != null, MSG_DECORATE_METHOD_ACCESSOR_ONLY, TypeError);
 
             if(!checkMode) {
-                return currentDescriptor;
+                return descriptor;
             }
 
-            const Clazz = (target as any).constructor,
-                dw = new DescriptorWrapper(currentDescriptor),
-                registration = MemberDecorator.registerFeature(Clazz, propertyKey, dw);
-
+            const Clazz = target.constructor as Constructor<any>,
+                registry = CLASS_REGISTRY.getOrCreate(Clazz),
+                registration = registry.featureRegistry.getOrCreate(propertyKey, descriptor);
             registration.ensures.push(predicate);
 
-            return dw.descriptor!;
+            return descriptor;
         };
     }
 }

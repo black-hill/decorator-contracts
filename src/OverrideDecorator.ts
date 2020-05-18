@@ -10,7 +10,7 @@ import MemberDecorator from './MemberDecorator';
 import Assertion from './Assertion';
 import type { Constructor } from './typings/Constructor';
 import { CLASS_REGISTRY } from './lib/ClassRegistry';
-import { MSG_NO_STATIC, MSG_NO_MATCHING_FEATURE, MSG_DUPLICATE_OVERRIDE, MSG_INVALID_ARG_LENGTH } from './Messages';
+import { MSG_NO_STATIC, MSG_NO_MATCHING_FEATURE, MSG_DUPLICATE_OVERRIDE, MSG_INVALID_ARG_LENGTH, MSG_DECORATE_METHOD_ACCESSOR_ONLY } from './Messages';
 
 const checkedAssert: Assertion['assert'] = new Assertion(true).assert;
 
@@ -69,15 +69,18 @@ export default class OverrideDecorator extends MemberDecorator {
         }
 
         const assert: Assertion['assert'] = this._assert,
-            isStatic = typeof target == 'function',
             dw = new DescriptorWrapper(descriptor);
-        assert(!isStatic, MSG_NO_STATIC, TypeError);
+        assert(typeof target != 'function', MSG_NO_STATIC, TypeError);
+        // Potentially undefined in pre ES5 environments (compilation target)
+        assert(descriptor != null, MSG_DECORATE_METHOD_ACCESSOR_ONLY, TypeError);
 
         const am = MemberDecorator.ancestorFeature(target, propertyKey);
         assert(am != null && dw.memberType === am.memberType, MSG_NO_MATCHING_FEATURE);
 
-        const Clazz = (target as any).constructor,
-            registration = MemberDecorator.registerFeature(Clazz, propertyKey, dw);
+        const Clazz = target.constructor as Constructor<any>,
+            registry = CLASS_REGISTRY.getOrCreate(Clazz),
+            registration = registry.featureRegistry.getOrCreate(propertyKey, descriptor);
+
         checkedAssert(!registration.overrides, MSG_DUPLICATE_OVERRIDE);
         registration.overrides = true;
 

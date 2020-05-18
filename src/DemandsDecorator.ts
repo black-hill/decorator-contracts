@@ -6,11 +6,11 @@
  */
 
 import MemberDecorator from './MemberDecorator';
-import DescriptorWrapper from './lib/DescriptorWrapper';
 import type {PredicateType} from './typings/PredicateType';
 import { Constructor } from './typings/Constructor';
 import Assertion from './Assertion';
-import { MSG_INVALID_DECORATOR, MSG_NO_STATIC } from './Messages';
+import { MSG_INVALID_DECORATOR, MSG_NO_STATIC, MSG_DECORATE_METHOD_ACCESSOR_ONLY } from './Messages';
+import { CLASS_REGISTRY } from './lib/ClassRegistry';
 
 /**
  * The `@demands` decorator is an assertion of a precondition.
@@ -43,18 +43,20 @@ export default class DemandsDecorator extends MemberDecorator {
         return function(target: object, propertyKey: PropertyKey, descriptor: PropertyDescriptor): PropertyDescriptor {
             const isStatic = typeof target == 'function';
             assert(!isStatic, MSG_NO_STATIC, TypeError);
+            // Potentially undefined in pre ES5 environments (compilation target)
+            assert(descriptor != null, MSG_DECORATE_METHOD_ACCESSOR_ONLY, TypeError);
 
             if(!checkMode) {
                 return descriptor;
             }
 
             const Clazz = target.constructor as Constructor<any>,
-                dw = new DescriptorWrapper(descriptor),
-                registration = MemberDecorator.registerFeature(Clazz, propertyKey, dw);
+                registry = CLASS_REGISTRY.getOrCreate(Clazz),
+                registration = registry.featureRegistry.getOrCreate(propertyKey, descriptor);
 
             registration.demands.push(predicate);
 
-            return dw.descriptor!;
+            return descriptor;
         };
     }
 }
