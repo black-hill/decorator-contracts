@@ -8,7 +8,7 @@
 /* eslint "require-jsdoc": "off" */
 
 import { Contracts, contracted } from './';
-import { MSG_DUPLICATE_RESCUE, MSG_SINGLE_RETRY, MSG_INVARIANT_REQUIRED } from './Messages';
+import { MSG_DUPLICATE_RESCUE, MSG_SINGLE_RETRY, MSG_EXTEND_CONTRACTED } from './Messages';
 
 /**
  * Requirement 400
@@ -340,7 +340,7 @@ describe('A class feature with a decorator must not be functional until the @inv
     test('Invalid declaration', () => {
         const fail = new Fail();
 
-        expect(() => fail.method(15)).toThrow(MSG_INVARIANT_REQUIRED);
+        expect(() => fail.method(15)).toThrow(MSG_EXTEND_CONTRACTED);
     });
 });
 
