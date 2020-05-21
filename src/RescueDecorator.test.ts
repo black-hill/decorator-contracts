@@ -15,10 +15,9 @@ import { MSG_DUPLICATE_RESCUE, MSG_SINGLE_RETRY, MSG_EXTEND_CONTRACTED } from '.
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/400
  */
 describe('Any error thrown by a class feature must be captured by its @rescue', () => {
-    const {invariant, rescue} = new Contracts(true);
+    const {rescue} = new Contracts(true);
 
     test('rescuing non-error method returns normal', () => {
-        @invariant
         class Base extends contracted() {
             @rescue(() => {})
             method(): number { return 7; }
@@ -29,7 +28,6 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
     });
 
     test('rescue of method with an error then retrying returns ok', () => {
-        @invariant
         class Base extends contracted() {
             @rescue((_error: any, _args: any[], retry: any) => retry(3))
             method(value: number): number {
@@ -45,7 +43,6 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
     });
 
     test('rescue of method with an error then rethrow throws to caller', () => {
-        @invariant
         class Base extends contracted() {
             @rescue(() => { throw new Error('Rescue throw'); })
             method(): void {
@@ -57,7 +54,6 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
     });
 
     test('rescuing non-error getter returns normal', () => {
-        @invariant
         class Base extends contracted() {
             @rescue(() => {})
             get value(): number { return 7; }
@@ -67,7 +63,6 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
     });
 
     test('rescuing error getter then retry returns ok', () => {
-        @invariant
         class Base extends contracted() {
             #value = 0;
 
@@ -91,7 +86,6 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
     });
 
     test('rescue of error getter then rethrow throws to caller', () => {
-        @invariant
         class Base extends contracted() {
             @rescue(() => {
                 throw new Error('Not Rescued');
@@ -105,7 +99,6 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
     });
 
     test('rescuing non-error setter then getting returns normal', () => {
-        @invariant
         class Base extends contracted() {
             #value = NaN;
 
@@ -119,7 +112,6 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
     });
 
     test('rescue of error setter then retry then getting returns ok', () => {
-        @invariant
         class Base extends contracted() {
             #value = NaN;
 
@@ -141,7 +133,6 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
     });
 
     test('rescue of error setter then rethrow throws error at caller', () => {
-        @invariant
         class Base extends contracted() {
             #value = NaN;
 
@@ -160,7 +151,7 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
  */
 describe('The @rescue constructor has a checked mode that enables its execution', () => {
     test('enabled', () => {
-        const {invariant, rescue} = new Contracts(true);
+        const {rescue} = new Contracts(true);
 
         /**
          * Throws arbitrary error
@@ -170,7 +161,6 @@ describe('The @rescue constructor has a checked mode that enables its execution'
         }
 
         expect(() => {
-            @invariant
             class Base extends contracted() {
                 @rescue(baseRescue)
                 throws(value: string): void {
@@ -184,10 +174,9 @@ describe('The @rescue constructor has a checked mode that enables its execution'
     });
 
     test('disabled', () => {
-        const {invariant, rescue} = new Contracts(false);
+        const {rescue} = new Contracts(false);
 
         expect(() => {
-            @invariant
             class Base extends contracted() {
                 @rescue(() => {
                     throw new Error('I am still an Error');
@@ -208,11 +197,10 @@ describe('The @rescue constructor has a checked mode that enables its execution'
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/455
  */
 describe('Only a single @rescue can be assigned to a method or accessor', () => {
-    const {invariant, rescue} = new Contracts(true);
+    const {rescue} = new Contracts(true);
 
     test('Single rescue ok', () => {
         expect(() => {
-            @invariant
             class Base extends contracted() {
                 @rescue(() => {})
                 method(): void {}
@@ -224,7 +212,6 @@ describe('Only a single @rescue can be assigned to a method or accessor', () => 
 
     test('Multiple rescue throws', () => {
         expect(() => {
-            @invariant
             class Base extends contracted() {
                 @rescue(() => {})
                 @rescue(() => {})
@@ -241,14 +228,13 @@ describe('Only a single @rescue can be assigned to a method or accessor', () => 
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/456
  */
 describe('The \'retry\' argument of the @rescue function can only be called once during rescue execution', () => {
-    const {invariant, rescue} = new Contracts(true);
+    const {rescue} = new Contracts(true);
 
     test('Call retry once succeeds', () => {
         function methodRescue(_error: any, _args: any[], retry: any): void {
             retry(3);
         }
 
-        @invariant
         class Base extends contracted() {
             @rescue(methodRescue)
             method(value: number): number {
@@ -268,7 +254,6 @@ describe('The \'retry\' argument of the @rescue function can only be called once
             retry(retry(3));
         }
 
-        @invariant
         class Base extends contracted() {
             @rescue(methodRescue)
             method(value: number): number {
@@ -318,9 +303,8 @@ describe('The @rescue function must preserve the invariant after execution', () 
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/539
  */
 describe('A class feature with a decorator must not be functional until the @invariant is defined', () => {
-    const {invariant, rescue} = new Contracts(true);
+    const {rescue} = new Contracts(true);
 
-    @invariant
     class Okay extends contracted() {
         @rescue(() => {})
         method(value: number): number { return value; }
@@ -349,9 +333,8 @@ describe('A class feature with a decorator must not be functional until the @inv
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/558
  */
 describe('If a @rescue is executed and the retry argument is not called, then an error is thrown', () => {
-    const {invariant, rescue} = new Contracts(true);
+    const {rescue} = new Contracts(true);
 
-    @invariant
     class Base extends contracted() {
         @rescue((_error, _args, retry) => { retry(false); })
         throwRescue(trigger: boolean): boolean {
@@ -386,7 +369,6 @@ describe('If a @rescue is executed and the retry argument is not called, then an
 describe('If an exception is thrown in a class feature without a @rescue defined, then the exception is raised to its caller after the @invariant is checked', () => {
     const {invariant} = new Contracts(true);
 
-    @invariant
     class A extends contracted() {
         method(): void {
             throw new Error('I am error');

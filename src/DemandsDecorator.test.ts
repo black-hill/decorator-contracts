@@ -7,7 +7,7 @@
 
 /* eslint "require-jsdoc": "off" */
 
-import {Contracts, contracted} from '.';
+import { Contracts, contracted } from '.';
 import { MSG_NO_STATIC, MSG_EXTEND_CONTRACTED } from './Messages';
 import AssertionError from './AssertionError';
 
@@ -66,7 +66,7 @@ describe('The @demands decorator must be a non-static feature decorator only', (
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/242
  */
 describe('There can be multiple @demands decorators assigned to a class feature', () => {
-    const {invariant, demands} = new Contracts(true);
+    const {demands} = new Contracts(true);
 
     function nonNegative(this: Foo): boolean {
         return this.value >= 0;
@@ -76,7 +76,6 @@ describe('There can be multiple @demands decorators assigned to a class feature'
         return this.value % 2 == 0;
     }
 
-    @invariant
     class Foo extends contracted() {
         #value = 0;
 
@@ -109,13 +108,12 @@ describe('There can be multiple @demands decorators assigned to a class feature'
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/244
  */
 describe('Features that override a @demands decorated feature must be subject to that decorator', () => {
-    const {invariant, override, demands} = new Contracts(true);
+    const {override, demands} = new Contracts(true);
 
     function nonNegative(this: Base): boolean {
         return this.value >= 0;
     }
 
-    @invariant
     class Base extends contracted() {
         #value = 0;
 
@@ -160,13 +158,12 @@ describe('Features that override a @demands decorated feature must be subject to
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/246
  */
 describe('@demands is evaluated before its associated feature is called', () => {
-    const {invariant, demands} = new Contracts(true);
+    const {demands} = new Contracts(true);
 
     function nonNegative(this: Foo): boolean {
         return this.value >= 0;
     }
 
-    @invariant
     class Foo extends contracted() {
         #value = 0;
 
@@ -207,9 +204,8 @@ describe('@demands is evaluated before its associated feature is called', () => 
 describe('@demands has a checked mode and unchecked mode', () => {
 
     test('The associated assertion is evaluated when checkMode = true', () => {
-        const {invariant, demands} = new Contracts(true);
+        const {demands} = new Contracts(true);
 
-        @invariant
         class Foo extends contracted() {
             @demands(() => false)
             method(): void {}
@@ -219,9 +215,8 @@ describe('@demands has a checked mode and unchecked mode', () => {
     });
 
     test('The associated assertion is NOT evaluated in checkMode = false', () => {
-        const {invariant, demands} = new Contracts(false);
+        const {demands} = new Contracts(false);
 
-        @invariant
         class Foo extends contracted() {
             @demands(() => false)
             method(): void {}
@@ -236,9 +231,8 @@ describe('@demands has a checked mode and unchecked mode', () => {
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/396
  */
 describe('Preconditions cannot be strengthened in a subtype', () => {
-    const {invariant, demands, override} = new Contracts(true);
+    const {demands, override} = new Contracts(true);
 
-    @invariant
     class Base extends contracted() {
         @demands((value: number) => 10 <= value && value <= 30)
         method(value: number): number { return value; }
@@ -301,9 +295,8 @@ describe('Preconditions cannot be strengthened in a subtype', () => {
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/539
  */
 describe('A class feature with a decorator must not be functional until the @invariant is defined', () => {
-    const {invariant, demands} = new Contracts(true);
+    const {demands} = new Contracts(true);
 
-    @invariant
     class Okay extends contracted() {
         @demands((value: number) => 10 <= value && value <= 30)
         method(value: number): number { return value; }

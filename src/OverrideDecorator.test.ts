@@ -124,7 +124,7 @@ describe('Using @override on a class member with no ancestor member is an error'
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/214
  */
 describe('using @override on a method with an ancestor with a different parameter count is an error', () => {
-    const {invariant, override} = new Contracts(true);
+    const {override} = new Contracts(true);
 
     test('bad override', () => {
         expect(() => {
@@ -167,7 +167,6 @@ describe('using @override on a method with an ancestor with a different paramete
 
     test('good override', () => {
         expect(() => {
-            @invariant
             class Base extends contracted() {
                 method(a: string, b: string): string {
                     return `${a}, ${b}`;
@@ -192,11 +191,10 @@ describe('using @override on a method with an ancestor with a different paramete
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/215
  */
 describe('A subclass with an overriding member missing @override is an error', () => {
-    const {invariant, override} = new Contracts(true);
+    const {override} = new Contracts(true);
 
     test('@override defined', () => {
         expect(() => {
-            @invariant
             class Base extends contracted() {
                 method(): void {}
 
@@ -217,7 +215,6 @@ describe('A subclass with an overriding member missing @override is an error', (
 
     test('@override missing', () => {
         expect(() => {
-            @invariant
             class Base extends contracted() {
                 method(): void {}
             }
@@ -230,7 +227,6 @@ describe('A subclass with an overriding member missing @override is an error', (
         }).toThrow('@override decorator missing on Sub.method');
 
         expect(() => {
-            @invariant
             class Base extends contracted() {
                 get prop(): number { return 3; }
             }
@@ -303,11 +299,10 @@ describe('Only a single @override can be assigned to a member per class', () => 
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/341
  */
 describe('Accessors must support @override', () => {
-    const {invariant, override} = new Contracts(true);
+    const {override} = new Contracts(true);
 
     test('instance accessor decorator does not throw', () => {
         expect(() => {
-            @invariant
             class Base extends contracted() {
                 #value = 0;
                 get value(): number { return this.#value; }
@@ -327,7 +322,6 @@ describe('Accessors must support @override', () => {
 
     test('bad accessor decorator throws', () => {
         expect(() => {
-            @invariant
             class Base extends contracted() {
                 #value = 0;
                 get value(): number { return this.#value; }
@@ -351,9 +345,8 @@ describe('Accessors must support @override', () => {
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/539
  */
 describe('A class feature with a decorator must not be functional until the @invariant is defined', () => {
-    const {invariant, override} = new Contracts(true);
+    const {override} = new Contracts(true);
 
-    @invariant
     class Base extends contracted(){
         method(value: number): number { return value; }
     }
