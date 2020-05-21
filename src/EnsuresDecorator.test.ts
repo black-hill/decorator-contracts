@@ -7,7 +7,7 @@
 
 /* eslint "require-jsdoc": "off" */
 
-import Contracts from '.';
+import {Contracts} from '.';
 import { MSG_NO_STATIC, MSG_INVARIANT_REQUIRED } from './Messages';
 import AssertionError from './AssertionError';
 
@@ -52,12 +52,12 @@ describe('The @ensures decorator must be a non-static method decorator only', ()
 
         expect(() => {
             const {ensures} = new Contracts(false);
-            // @ts-ignore: ignore type error for testing
+            // @ts-ignore: ignore type error for testing JS usage
             @ensures(() => true)
             class Foo {}
 
             return Foo;
-        }).not.toThrow();
+        }).toThrow();
     });
 });
 

@@ -6,7 +6,7 @@
  */
 
 import AssertionError from './AssertionError';
-import Contracts from './';
+import {Contracts} from './';
 
 /**
  * Requirement 69

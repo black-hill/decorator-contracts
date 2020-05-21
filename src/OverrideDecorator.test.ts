@@ -5,7 +5,7 @@
  * @see <https://spdx.org/licenses/AGPL-3.0-only.html>
  */
 
-import Contracts from './';
+import {Contracts} from './';
 import { MSG_NO_MATCHING_FEATURE, MSG_INVALID_ARG_LENGTH, MSG_DUPLICATE_OVERRIDE, MSG_INVARIANT_REQUIRED } from './Messages';
 
 /**

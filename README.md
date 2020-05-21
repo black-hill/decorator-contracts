@@ -52,7 +52,7 @@ Then run the command:
 After installation the library can be imported as such:
 
 ```typescript
-import Contracts from '@thenewobjective/decorator-contracts';
+import {Contracts} from '@thenewobjective/decorator-contracts';
 ```
 
 It is not enough to import the library though, there are two modes of usage:

@@ -7,7 +7,7 @@
 
 /* eslint "require-jsdoc": "off" */
 
-import Contracts from './';
+import {Contracts} from './';
 import { MSG_DUPLICATE_RESCUE, MSG_SINGLE_RETRY, MSG_INVARIANT_REQUIRED } from './Messages';
 
 /**

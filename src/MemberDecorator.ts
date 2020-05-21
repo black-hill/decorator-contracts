@@ -12,17 +12,9 @@ import { FeatureRegistration } from './lib/FeatureRegistry';
 import getAncestry from './lib/getAncestry';
 import type { Constructor } from './typings/Constructor';
 import { CLASS_REGISTRY } from './lib/ClassRegistry';
-import { MSG_SINGLE_RETRY } from './Messages';
+import { MSG_SINGLE_RETRY, MSG_NO_STATIC, MSG_DECORATE_METHOD_ACCESSOR_ONLY } from './Messages';
 
-/**
- * The default feature implementation until an invariant is
- * assigned to the class ancestry
- */
-// function fnInvariantRequired(): void {
-//     throw new AssertionError(MSG_INVARIANT_REQUIRED);
-// }
-
-const checkedAssert: Assertion['assert'] = new Assertion(true).assert;
+const assert: Assertion['assert'] = new Assertion(true).assert;
 
 export default abstract class MemberDecorator {
     protected _assert: Assertion['assert'];
@@ -143,7 +135,7 @@ export default abstract class MemberDecorator {
 
                 checkedFeature = (feature: Function) => function _checkedFeature(this: typeof Clazz, ...args: any[]): any {
                     if(allDemands.length > 0) {
-                        checkedAssert(
+                        assert(
                             allDemands.some(
                                 demands => demands.every(
                                     demand => demand.apply(this, args)
@@ -157,7 +149,7 @@ export default abstract class MemberDecorator {
                     try {
                         result = feature.apply(this, args);
                         if(allEnsures.length > 0) {
-                            checkedAssert(
+                            assert(
                                 allEnsures.every(
                                     ensures => ensures.every(
                                         ensure => ensure.apply(this, args)
@@ -172,7 +164,7 @@ export default abstract class MemberDecorator {
                         }
                         let hasRetried = false;
                         fnRescue.call(this, error, args, (...retryArgs: any[]) => {
-                            checkedAssert(!hasRetried, MSG_SINGLE_RETRY);
+                            assert(!hasRetried, MSG_SINGLE_RETRY);
                             hasRetried = true;
                             result = _checkedFeature.call(this, ...retryArgs);
                         });
@@ -202,5 +194,16 @@ export default abstract class MemberDecorator {
 
             Object.defineProperty(proto, propertyKey, newDescriptor);
         });
+    }
+
+    static registerMember(target: object, propertyKey: PropertyKey, descriptor: PropertyDescriptor): FeatureRegistration {
+        assert(typeof target != 'function', MSG_NO_STATIC, TypeError);
+        // Potentially undefined in pre ES5 environments (compilation target)
+        assert(descriptor != null, MSG_DECORATE_METHOD_ACCESSOR_ONLY, TypeError);
+
+        const Clazz = target.constructor as Constructor<any>,
+              registry = CLASS_REGISTRY.getOrCreate(Clazz);
+
+        return registry.featureRegistry.getOrCreate(propertyKey, descriptor);
     }
 }

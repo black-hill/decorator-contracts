@@ -6,6 +6,7 @@
  */
 
 import Assertion from './Assertion';
+import contracted from './contracted';
 import EnsuresDecorator from './EnsuresDecorator';
 import InvariantDecorator from './InvariantDecorator';
 import OverrideDecorator from './OverrideDecorator';
@@ -94,4 +95,4 @@ class Contracts {
     }
 }
 
-export default Contracts;
+export {Contracts,contracted};

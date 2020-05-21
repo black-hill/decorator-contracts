@@ -7,7 +7,7 @@
 
 /* eslint "require-jsdoc": "off" */
 
-import Contracts from '.';
+import {Contracts} from '.';
 import { MSG_NO_STATIC, MSG_INVARIANT_REQUIRED } from './Messages';
 import AssertionError from './AssertionError';
 

@@ -5,7 +5,7 @@
  * @see <https://spdx.org/licenses/AGPL-3.0-only.html>
  */
 
-import Contracts from './';
+import {Contracts} from './';
 
 /**
  * Requirement 194

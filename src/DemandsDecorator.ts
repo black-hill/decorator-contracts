@@ -7,10 +7,11 @@
 
 import MemberDecorator from './MemberDecorator';
 import type {PredicateType} from './typings/PredicateType';
-import { Constructor } from './typings/Constructor';
 import Assertion from './Assertion';
-import { MSG_INVALID_DECORATOR, MSG_NO_STATIC, MSG_DECORATE_METHOD_ACCESSOR_ONLY } from './Messages';
-import { CLASS_REGISTRY } from './lib/ClassRegistry';
+import { MSG_INVALID_DECORATOR } from './Messages';
+import isClass from './lib/isClass';
+
+const assert: Assertion['assert'] = new Assertion(true).assert;
 
 /**
  * The `@demands` decorator is an assertion of a precondition.
@@ -36,25 +37,16 @@ export default class DemandsDecorator extends MemberDecorator {
      * @returns {MethodDecorator} - The Method Decorator
      */
     demands(predicate: PredicateType): MethodDecorator {
-        const checkMode = this.checkMode,
-            assert: Assertion['assert'] = this._assert;
-        this._checkedAssert(typeof predicate == 'function', MSG_INVALID_DECORATOR);
+        const {checkMode} = this;
+        assert(typeof predicate == 'function', MSG_INVALID_DECORATOR);
+        assert(!isClass(predicate), MSG_INVALID_DECORATOR);
 
         return function(target: object, propertyKey: PropertyKey, descriptor: PropertyDescriptor): PropertyDescriptor {
-            const isStatic = typeof target == 'function';
-            assert(!isStatic, MSG_NO_STATIC, TypeError);
-            // Potentially undefined in pre ES5 environments (compilation target)
-            assert(descriptor != null, MSG_DECORATE_METHOD_ACCESSOR_ONLY, TypeError);
+            const registration = MemberDecorator.registerMember(target, propertyKey, descriptor);
 
-            if(!checkMode) {
-                return descriptor;
+            if(checkMode) {
+                registration.demands.push(predicate);
             }
-
-            const Clazz = target.constructor as Constructor<any>,
-                registry = CLASS_REGISTRY.getOrCreate(Clazz),
-                registration = registry.featureRegistry.getOrCreate(propertyKey, descriptor);
-
-            registration.demands.push(predicate);
 
             return descriptor;
         };

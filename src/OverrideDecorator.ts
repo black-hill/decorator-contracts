@@ -5,14 +5,13 @@
  * @see <https://spdx.org/licenses/AGPL-3.0-only.html>
  */
 
-import DescriptorWrapper from './lib/DescriptorWrapper';
 import MemberDecorator from './MemberDecorator';
 import Assertion from './Assertion';
 import type { Constructor } from './typings/Constructor';
 import { CLASS_REGISTRY } from './lib/ClassRegistry';
-import { MSG_NO_STATIC, MSG_NO_MATCHING_FEATURE, MSG_DUPLICATE_OVERRIDE, MSG_INVALID_ARG_LENGTH, MSG_DECORATE_METHOD_ACCESSOR_ONLY } from './Messages';
+import { MSG_NO_MATCHING_FEATURE, MSG_DUPLICATE_OVERRIDE, MSG_INVALID_ARG_LENGTH } from './Messages';
 
-const checkedAssert: Assertion['assert'] = new Assertion(true).assert;
+const assert: Assertion['assert'] = new Assertion(true).assert;
 
 /**
  * The 'override' decorator asserts that the current class feautre is a specialization or
@@ -47,7 +46,7 @@ export default class OverrideDecorator extends MemberDecorator {
 
         featureNames.forEach(featureName => {
             const registration = featureRegistry.get(featureName);
-            checkedAssert(
+            assert(
                 (registration != null && registration.overrides) || !ancestorFeatureNames.has(featureName),
                 `@override decorator missing on ${Class.name}.${String(featureName)}`
             );
@@ -64,30 +63,23 @@ export default class OverrideDecorator extends MemberDecorator {
      * @returns {PropertyDescriptor} - The PropertyDescriptor
      */
     override(target: object, propertyKey: PropertyKey, descriptor: PropertyDescriptor): PropertyDescriptor {
+        const registration = MemberDecorator.registerMember(target, propertyKey, descriptor);
+
         if(!this.checkMode) {
             return descriptor;
         }
 
-        const assert: Assertion['assert'] = this._assert,
-            dw = new DescriptorWrapper(descriptor);
-        assert(typeof target != 'function', MSG_NO_STATIC, TypeError);
-        // Potentially undefined in pre ES5 environments (compilation target)
-        assert(descriptor != null, MSG_DECORATE_METHOD_ACCESSOR_ONLY, TypeError);
-
-        const am = MemberDecorator.ancestorFeature(target, propertyKey);
+        const dw = registration.descriptorWrapper,
+              am = MemberDecorator.ancestorFeature(target, propertyKey);
         assert(am != null && dw.memberType === am.memberType, MSG_NO_MATCHING_FEATURE);
 
-        const Clazz = target.constructor as Constructor<any>,
-            registry = CLASS_REGISTRY.getOrCreate(Clazz),
-            registration = registry.featureRegistry.getOrCreate(propertyKey, descriptor);
-
-        checkedAssert(!registration.overrides, MSG_DUPLICATE_OVERRIDE);
+        assert(!registration.overrides, MSG_DUPLICATE_OVERRIDE);
         registration.overrides = true;
 
-        if(registration.descriptorWrapper.isMethod) {
-            const thisMethod: Function = registration.descriptorWrapper.value,
-                ancMethod: Function = am!.value;
-            checkedAssert(thisMethod.length == ancMethod.length, MSG_INVALID_ARG_LENGTH);
+        if(dw.isMethod) {
+            const thisMethod: Function = dw.value,
+                  ancMethod: Function = am!.value;
+            assert(thisMethod.length == ancMethod.length, MSG_INVALID_ARG_LENGTH);
         }
 
         return descriptor;
