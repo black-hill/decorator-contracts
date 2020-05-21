@@ -7,7 +7,7 @@
 
 /* eslint "require-jsdoc": "off" */
 
-import {Contracts} from './';
+import { Contracts, contracted } from './';
 import { MSG_DUPLICATE_RESCUE, MSG_SINGLE_RETRY, MSG_INVARIANT_REQUIRED } from './Messages';
 
 /**
@@ -19,7 +19,7 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
 
     test('rescuing non-error method returns normal', () => {
         @invariant
-        class Base {
+        class Base extends contracted() {
             @rescue(() => {})
             method(): number { return 7; }
         }
@@ -30,7 +30,7 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
 
     test('rescue of method with an error then retrying returns ok', () => {
         @invariant
-        class Base {
+        class Base extends contracted() {
             @rescue((_error: any, _args: any[], retry: any) => retry(3))
             method(value: number): number {
                 if(value <= 0) {
@@ -46,7 +46,7 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
 
     test('rescue of method with an error then rethrow throws to caller', () => {
         @invariant
-        class Base {
+        class Base extends contracted() {
             @rescue(() => { throw new Error('Rescue throw'); })
             method(): void {
                 throw new Error('Method error');
@@ -58,7 +58,7 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
 
     test('rescuing non-error getter returns normal', () => {
         @invariant
-        class Base {
+        class Base extends contracted() {
             @rescue(() => {})
             get value(): number { return 7; }
         }
@@ -68,7 +68,7 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
 
     test('rescuing error getter then retry returns ok', () => {
         @invariant
-        class Base {
+        class Base extends contracted() {
             #value = 0;
 
             @rescue(function(this: Base, _error: any, _args: any[], retry: Function) {
@@ -92,7 +92,7 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
 
     test('rescue of error getter then rethrow throws to caller', () => {
         @invariant
-        class Base {
+        class Base extends contracted() {
             @rescue(() => {
                 throw new Error('Not Rescued');
             })
@@ -106,7 +106,7 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
 
     test('rescuing non-error setter then getting returns normal', () => {
         @invariant
-        class Base {
+        class Base extends contracted() {
             #value = NaN;
 
             get value(): number { return this.#value; }
@@ -120,7 +120,7 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
 
     test('rescue of error setter then retry then getting returns ok', () => {
         @invariant
-        class Base {
+        class Base extends contracted() {
             #value = NaN;
 
             get value(): number { return this.#value; }
@@ -142,7 +142,7 @@ describe('Any error thrown by a class feature must be captured by its @rescue', 
 
     test('rescue of error setter then rethrow throws error at caller', () => {
         @invariant
-        class Base {
+        class Base extends contracted() {
             #value = NaN;
 
             get value(): number { return this.#value; }
@@ -171,7 +171,7 @@ describe('The @rescue constructor has a checked mode that enables its execution'
 
         expect(() => {
             @invariant
-            class Base {
+            class Base extends contracted() {
                 @rescue(baseRescue)
                 throws(value: string): void {
                     throw new Error(value);
@@ -188,7 +188,7 @@ describe('The @rescue constructor has a checked mode that enables its execution'
 
         expect(() => {
             @invariant
-            class Base {
+            class Base extends contracted() {
                 @rescue(() => {
                     throw new Error('I am still an Error');
                 })
@@ -213,7 +213,7 @@ describe('Only a single @rescue can be assigned to a method or accessor', () => 
     test('Single rescue ok', () => {
         expect(() => {
             @invariant
-            class Base {
+            class Base extends contracted() {
                 @rescue(() => {})
                 method(): void {}
             }
@@ -225,7 +225,7 @@ describe('Only a single @rescue can be assigned to a method or accessor', () => 
     test('Multiple rescue throws', () => {
         expect(() => {
             @invariant
-            class Base {
+            class Base extends contracted() {
                 @rescue(() => {})
                 @rescue(() => {})
                 method(): void {}
@@ -249,7 +249,7 @@ describe('The \'retry\' argument of the @rescue function can only be called once
         }
 
         @invariant
-        class Base {
+        class Base extends contracted() {
             @rescue(methodRescue)
             method(value: number): number {
                 if(value <= 0) {
@@ -269,7 +269,7 @@ describe('The \'retry\' argument of the @rescue function can only be called once
         }
 
         @invariant
-        class Base {
+        class Base extends contracted() {
             @rescue(methodRescue)
             method(value: number): number {
                 if(value <= 0) {
@@ -292,7 +292,7 @@ describe('The @rescue function must preserve the invariant after execution', () 
     const {invariant, rescue} = new Contracts(true);
 
     @invariant(function(this: Base) { return this.value > 0; })
-    class Base {
+    class Base extends contracted() {
         #value = 3;
         get value(): number { return this.#value; }
         set value(v: number) { this.#value = v; }
@@ -321,7 +321,7 @@ describe('A class feature with a decorator must not be functional until the @inv
     const {invariant, rescue} = new Contracts(true);
 
     @invariant
-    class Okay {
+    class Okay extends contracted() {
         @rescue(() => {})
         method(value: number): number { return value; }
     }
@@ -332,7 +332,7 @@ describe('A class feature with a decorator must not be functional until the @inv
         expect(okay.method(15)).toBe(15);
     });
 
-    class Fail {
+    class Fail extends contracted() {
         @rescue(() => {})
         method(value: number): number { return value; }
     }
@@ -352,7 +352,7 @@ describe('If a @rescue is executed and the retry argument is not called, then an
     const {invariant, rescue} = new Contracts(true);
 
     @invariant
-    class Base {
+    class Base extends contracted() {
         @rescue((_error, _args, retry) => { retry(false); })
         throwRescue(trigger: boolean): boolean {
             if(trigger) {
@@ -387,7 +387,7 @@ describe('If an exception is thrown in a class feature without a @rescue defined
     const {invariant} = new Contracts(true);
 
     @invariant
-    class A {
+    class A extends contracted() {
         method(): void {
             throw new Error('I am error');
         }
@@ -398,7 +398,7 @@ describe('If an exception is thrown in a class feature without a @rescue defined
     });
 
     @invariant(function(this: B): boolean { return this.value > 0; })
-    class B {
+    class B extends contracted() {
         #value = 1;
 
         get value(): number { return this.#value; }
@@ -432,7 +432,7 @@ describe('If an error is thrown in @demands, the error is raised to the caller',
     function isNonNegative(value: number): boolean { return value >= 0; }
 
     @invariant(isPositive)
-    class A {
+    class A extends contracted() {
         #value = 1;
 
         get value(): number { return this.#value; }
@@ -477,7 +477,7 @@ describe('If an error is raised in a @ensures then the associated @rescue is exe
     function isNonNegative(this: A): boolean { return this.value >= 0; }
 
     @invariant(isNonNegative)
-    class A {
+    class A extends contracted() {
         #value = 1;
 
         get value(): number { return this.#value; }

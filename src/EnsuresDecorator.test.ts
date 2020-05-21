@@ -7,7 +7,7 @@
 
 /* eslint "require-jsdoc": "off" */
 
-import {Contracts} from '.';
+import {Contracts, contracted} from '.';
 import { MSG_NO_STATIC, MSG_INVARIANT_REQUIRED } from './Messages';
 import AssertionError from './AssertionError';
 
@@ -20,7 +20,7 @@ describe('The @ensures decorator must be a non-static method decorator only', ()
         const {ensures} = new Contracts(true);
 
         expect(() => {
-            class Foo {
+            class Foo extends contracted() {
                 @ensures(() => true)
                 method1(): void {}
 
@@ -34,7 +34,7 @@ describe('The @ensures decorator must be a non-static method decorator only', ()
         expect(() => {
             //@ts-ignore: ignoring typescript error for JavaScript testing
             @ensures(() => true)
-            class Foo {}
+            class Foo extends contracted() {}
 
             return Foo;
         }).toThrow(MSG_NO_STATIC);
@@ -45,7 +45,7 @@ describe('The @ensures decorator must be a non-static method decorator only', ()
             const {ensures} = new Contracts(true);
             // @ts-ignore: ignore type error for testing
             @ensures(() => true)
-            class Foo {}
+            class Foo extends contracted() {}
 
             return Foo;
         }).toThrow();
@@ -54,7 +54,7 @@ describe('The @ensures decorator must be a non-static method decorator only', ()
             const {ensures} = new Contracts(false);
             // @ts-ignore: ignore type error for testing JS usage
             @ensures(() => true)
-            class Foo {}
+            class Foo extends contracted() {}
 
             return Foo;
         }).toThrow();
@@ -77,7 +77,7 @@ describe('There can be multiple @ensures decorators assigned to a class feature'
     }
 
     @invariant
-    class Foo {
+    class Foo extends contracted() {
         #value = 0;
 
         get value(): number { return this.#value; }
@@ -115,7 +115,7 @@ describe('Features that override a @ensures decorated method must be subject to 
     }
 
     @invariant
-    class Base {
+    class Base extends contracted() {
         #value = 0;
 
         get value(): number { return this.#value; }
@@ -165,7 +165,7 @@ describe('@ensures is evaluated after its associated member is called', () => {
     }
 
     @invariant
-    class Foo {
+    class Foo extends contracted() {
         #value = 0;
 
         get value(): number { return this.#value; }
@@ -207,7 +207,7 @@ describe('@ensures has a checked mode and unchecked mode', () => {
         const {invariant, ensures} = new Contracts(true);
 
         @invariant
-        class Foo {
+        class Foo extends contracted() {
             @ensures(() => false)
             method(): void {}
         }
@@ -219,7 +219,7 @@ describe('@ensures has a checked mode and unchecked mode', () => {
         const {invariant, ensures} = new Contracts(false);
 
         @invariant
-        class Foo {
+        class Foo extends contracted() {
             @ensures(() => false)
             method(): void {}
         }
@@ -236,7 +236,7 @@ describe('Postconditions cannot be weakened in a subtype', () => {
     const {invariant, ensures, override} = new Contracts(true);
 
     @invariant
-    class Base {
+    class Base extends contracted() {
         @ensures((value: number) => 10 <= value && value <= 30)
         method(value: number): number { return value; }
     }
@@ -290,7 +290,7 @@ describe('A class feature with a decorator must not be functional until the @inv
     const {invariant, ensures} = new Contracts(true);
 
     @invariant
-    class Okay {
+    class Okay extends contracted() {
         @ensures((value: number) => 10 <= value && value <= 30)
         method(value: number): number { return value; }
     }
@@ -301,7 +301,7 @@ describe('A class feature with a decorator must not be functional until the @inv
         expect(okay.method(15)).toBe(15);
     });
 
-    class Fail {
+    class Fail extends contracted() {
         @ensures((value: number) => 10 <= value && value <= 30)
         method(value: number): number { return value; }
     }

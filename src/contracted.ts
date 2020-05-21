@@ -16,7 +16,8 @@ const classProxyHandler: ProxyHandler<any> = {
 },
 instanceHandler: ProxyHandler<any> = {
 
-};
+},
+IS_CONTRACTED = Symbol('Is Contracted');
 
 /**
  * Enables code contracts for the extended class.
@@ -30,10 +31,11 @@ instanceHandler: ProxyHandler<any> = {
  */
 function contracted<T extends Constructor<any>>(Base?: T): T {
     const ClassProxy = Base == undefined ?
-        new Proxy(class Contracted{}, classProxyHandler) :
-        new Proxy(class Contracted extends Base{}, classProxyHandler);
+        new Proxy(class Contracted { static [IS_CONTRACTED] = true; }, classProxyHandler) :
+        new Proxy(class Contracted extends Base{ static [IS_CONTRACTED] = true; }, classProxyHandler);
 
     return ClassProxy as T;
 }
 
+export {IS_CONTRACTED};
 export default contracted;

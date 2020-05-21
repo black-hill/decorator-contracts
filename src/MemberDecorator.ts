@@ -7,12 +7,12 @@
 
 import Assertion from './Assertion';
 import DescriptorWrapper from './lib/DescriptorWrapper';
-//import AssertionError from './AssertionError';
 import { FeatureRegistration } from './lib/FeatureRegistry';
 import getAncestry from './lib/getAncestry';
 import type { Constructor } from './typings/Constructor';
 import { CLASS_REGISTRY } from './lib/ClassRegistry';
-import { MSG_SINGLE_RETRY, MSG_NO_STATIC, MSG_DECORATE_METHOD_ACCESSOR_ONLY } from './Messages';
+import { MSG_SINGLE_RETRY, MSG_NO_STATIC, MSG_DECORATE_METHOD_ACCESSOR_ONLY, MSG_INVARIANT_REQUIRED } from './Messages';
+import { IS_CONTRACTED } from './contracted';
 
 const assert: Assertion['assert'] = new Assertion(true).assert;
 
@@ -201,8 +201,11 @@ export default abstract class MemberDecorator {
         // Potentially undefined in pre ES5 environments (compilation target)
         assert(descriptor != null, MSG_DECORATE_METHOD_ACCESSOR_ONLY, TypeError);
 
-        const Clazz = target.constructor as Constructor<any>,
-              registry = CLASS_REGISTRY.getOrCreate(Clazz);
+        const Class = target.constructor as Constructor<any> & {[IS_CONTRACTED]: boolean},
+              registry = CLASS_REGISTRY.getOrCreate(Class);
+
+        // TODO: fix the message: class must extent contracted()
+        assert(Class[IS_CONTRACTED] == true, MSG_INVARIANT_REQUIRED);
 
         return registry.featureRegistry.getOrCreate(propertyKey, descriptor);
     }
