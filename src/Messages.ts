@@ -8,7 +8,7 @@
 export const ASSERTION_FAILED = 'Assertion failure';
 export const MSG_NO_STATIC = 'Only instance members can be decorated, not static members';
 export const MSG_DECORATE_METHOD_ACCESSOR_ONLY = 'Only methods and accessors can be decorated.';
-export const MSG_EXTEND_CONTRACTED = 'The current class or one of its ancestors must extend contracted(...)';
+export const MSG_CONTRACTED = 'The current class or one of its ancestors must extend contracted(...)';
 export const MSG_INVALID_DECORATOR = 'Invalid decorator declaration';
 export const MSG_SINGLE_RETRY = 'retry can only be called once';
 export const MSG_INVALID_ARG_LENGTH = 'An overridden method must have the same number of parameters as its ancestor method';

@@ -31,10 +31,9 @@ class ContractHandler {
         const ancestry = getAncestry(self.constructor as Constructor<any>);
         ancestry.forEach(Cons => {
             const invariants = CLASS_REGISTRY.get(Cons)?.invariants ?? [];
-            invariants.forEach(invariant => {
-                const name = invariant.name;
-                this._assert(invariant.apply(self), `Invariant violated. ${name}: ${invariant.toString()}`);
-            });
+            invariants.forEach(invariant =>
+                this._assert(invariant.apply(self), `Invariant violated. ${invariant.name}: ${invariant.toString()}`)
+            );
         });
     }
 

@@ -11,7 +11,7 @@ import { FeatureRegistration } from './lib/FeatureRegistry';
 import getAncestry from './lib/getAncestry';
 import type { Constructor } from './typings/Constructor';
 import { CLASS_REGISTRY } from './lib/ClassRegistry';
-import { MSG_SINGLE_RETRY, MSG_NO_STATIC, MSG_DECORATE_METHOD_ACCESSOR_ONLY, MSG_EXTEND_CONTRACTED } from './Messages';
+import { MSG_SINGLE_RETRY, MSG_NO_STATIC, MSG_DECORATE_METHOD_ACCESSOR_ONLY, MSG_CONTRACTED } from './Messages';
 import { IS_CONTRACTED } from './contracted';
 
 const assert: Assertion['assert'] = new Assertion(true).assert;
@@ -204,7 +204,7 @@ export default abstract class MemberDecorator {
         const Class = target.constructor as Constructor<any> & {[IS_CONTRACTED]: boolean},
               registry = CLASS_REGISTRY.getOrCreate(Class);
 
-        assert(Class[IS_CONTRACTED] == true, MSG_EXTEND_CONTRACTED);
+        assert(Class[IS_CONTRACTED] == true, MSG_CONTRACTED);
 
         return registry.featureRegistry.getOrCreate(propertyKey, descriptor);
     }

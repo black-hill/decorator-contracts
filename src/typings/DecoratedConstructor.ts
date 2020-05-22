@@ -5,6 +5,8 @@
  * @see <https://spdx.org/licenses/AGPL-3.0-only.html>
  */
 
+// TODO: Deprecate in favor of CLASS_REGISTRY directly
+
 import type {Constructor} from './Constructor';
 // TODO: move symbols
 export const IS_PROXY = Symbol('Is Proxy');
