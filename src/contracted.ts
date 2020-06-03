@@ -6,29 +6,26 @@
  */
 
 import { Constructor } from './typings/Constructor';
-import getAncestry from './lib/getAncestry';
 import OverrideDecorator from './OverrideDecorator';
-import MemberDecorator from './MemberDecorator';
 import { CLASS_REGISTRY } from './lib/ClassRegistry';
 
 const classProxyHandler: ProxyHandler<any> = {
-    construct(target, args, newTarget) {
-        const registration = CLASS_REGISTRY.getOrCreate(newTarget),
-              ancestry = getAncestry(newTarget).reverse();
+    construct(Target, args, NewTarget) {
+        const registration = CLASS_REGISTRY.getOrCreate(NewTarget),
+              {ancestry} = registration;
 
-        ancestry.forEach(Cons => {
+        ancestry.reverse().forEach(Cons => {
             const registration = CLASS_REGISTRY.getOrCreate(Cons);
 
-            if(!registration.isRestored) {
+            if(registration.overridesChecked == false) {
                 OverrideDecorator.checkOverrides(Cons);
-                MemberDecorator.restoreFeatures(Cons);
-                registration.isRestored = true;
+                registration.overridesChecked = true;
             }
         });
 
-        // https://stackoverflow.com/a/43104489/153209
-        const instance = Reflect.construct(target, args, newTarget);
-        registration.contractHandler.assertInvariants(instance);
+        const instance = Reflect.construct(Target, args, NewTarget);
+        // FIXME: throws
+        //registration.contractHandler.assertInvariants(instance);
 
         return new Proxy(instance, registration.contractHandler);
     }
@@ -55,5 +52,3 @@ function contracted<T extends Constructor<any>>(Base?: T): T {
 
 export {IS_CONTRACTED};
 export default contracted;
-
-////////////////////

@@ -12,11 +12,23 @@ import Assertion from '../Assertion';
 import { FeatureRegistry } from './FeatureRegistry';
 import { IS_PROXY, INNER_CLASS, DecoratedConstructor } from '../typings/DecoratedConstructor';
 
+/**
+ * Returns the inheritance chain of the provided class including the class
+ *
+ * @param {Constructor<any>} Clazz - The class to evaluate
+ * @returns {Constructor<any>[]} - The array of ancestors
+ */
+function getAncestry(Clazz: Constructor<any>): Constructor<any>[] {
+    return Clazz == null ? [] :
+        [Clazz].concat(getAncestry(Object.getPrototypeOf(Clazz)));
+}
+
 export class ClassRegistration {
     readonly contractHandler = new ContractHandler(new Assertion(true).assert);
     readonly featureRegistry: FeatureRegistry = new FeatureRegistry();
     readonly invariants: PredicateType[] = [];
-    isRestored = false;
+    readonly ancestry: Constructor<any>[] = [];
+    overridesChecked = false;
 }
 
 /**
@@ -54,7 +66,9 @@ class ClassRegistry extends WeakMap<Constructor<any>, ClassRegistration> {
         if(this.has(Class)) {
             return this.get(Class)!;
         } else {
-            this.set(Class, new ClassRegistration());
+            this.set(Class, Object.assign(new ClassRegistration(), {
+                ancestry: getAncestry(Class)
+            }));
 
             return this.get(Class)!;
         }
