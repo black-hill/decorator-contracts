@@ -8,10 +8,10 @@
 import Assertion from './Assertion';
 import {CLASS_REGISTRY} from './lib/ClassRegistry';
 import type {Constructor} from './typings/Constructor';
-import { FeatureRegistration } from 'lib/FeatureRegistry';
-import { PredicateType } from 'typings/PredicateType';
-import { RescueType } from 'typings/RescueType';
-import { MSG_SINGLE_RETRY } from 'Messages';
+import { FeatureRegistration } from './lib/FeatureRegistry';
+import { PredicateType } from './typings/PredicateType';
+import { RescueType } from './typings/RescueType';
+import { MSG_SINGLE_RETRY } from './Messages';
 
 const assert: Assertion['assert'] = new Assertion(true).assert;
 
@@ -64,8 +64,8 @@ class ContractHandler {
                   [allDemands, allEnsures, fnRescue] = ancFeatureRegistries
                     .reduce<[PredicateType[][], PredicateType[][], RescueType?]>(
                       (sum, next) => [
-                            sum[0].concat(next.demands),
-                            sum[1].concat(next.ensures),
+                            [...sum[0],next.demands],
+                            [...sum[1],next.ensures],
                             sum[2] ?? next.rescue
                       ],[[],[],]
                   ),

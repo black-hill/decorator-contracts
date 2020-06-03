@@ -16,7 +16,7 @@ import AssertionError from './AssertionError';
  * https://dev.azure.com/thenewobjective/decorator-contracts/_workitems/edit/241
  */
 describe('The @demands decorator must be a non-static feature decorator only', () => {
-    test('Test declaration', () => {
+    test('Valid declaration', () => {
         const {demands} = new Contracts(true);
 
         expect(() => {
@@ -30,6 +30,10 @@ describe('The @demands decorator must be a non-static feature decorator only', (
 
             return Foo;
         }).not.toThrow();
+    });
+
+    test('Invalid declaration', () => {
+        const {demands} = new Contracts(true);
 
         expect(() => {
             //@ts-ignore: ignoring typescript error for JavaScript testing
@@ -38,26 +42,15 @@ describe('The @demands decorator must be a non-static feature decorator only', (
 
             return Foo;
         }).toThrow(MSG_NO_STATIC);
-    });
-
-    test('Invalid declaration', () => {
-        expect(() => {
-            const {demands} = new Contracts(true);
-            // @ts-ignore: ignore type error for testing
-            @demands(() => true)
-            class Foo extends contracted() {}
-
-            return Foo;
-        }).toThrow();
 
         expect(() => {
-            const {demands} = new Contracts(false);
-            // @ts-ignore: ignore type error for testing
-            @demands(() => true)
-            class Foo extends contracted() {}
+            class Foo extends contracted() {
+                @demands(() => true)
+                static bar(): void {}
+            }
 
             return Foo;
-        }).not.toThrow();
+        }).toThrow(MSG_NO_STATIC);
     });
 });
 
